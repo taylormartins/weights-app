@@ -1,0 +1,16 @@
+{
+  "name": "Workout Volume Calc",
+  "short_name": "VolumeCalc",
+  "start_url": "/index.html",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#10ad97",
+  "description": "Calculate total workout volume from text uploads.",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/1043/1043321.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
