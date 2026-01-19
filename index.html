@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Workout Volume Calc</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
+    <style>
+        .container { max-width: 600px; margin-top: 50px; }
+        #results { margin-top: 20px; display: none; }
+        .volume-badge { font-size: 2rem; color: #10ad97; }
+    </style>
+</head>
+<body>
+    <main class="container">
+        <h2>Workout Volume Calculator</h2>
+        <p>Upload a .txt file with format: <code>weight, sets, reps</code></p>
+        
+        <form id="uploadForm">
+            <input type="file" id="workoutFile" accept=".txt,.csv" required>
+            <button type="submit" id="submitBtn">Calculate Volume</button>
+        </form>
+
+        <section id="results">
+            <hr>
+            <h3>Total Volume: <span id="totalVol" class="volume-badge">0</span> lbs</h3>
+            <table id="detailsTable">
+                <thead>
+                    <tr>
+                        <th>Weight</th>
+                        <th>Sets</th>
+                        <th>Reps</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </section>
+    </main>
+
+    <script>
+        const form = document.getElementById('uploadForm');
+        const resultsSection = document.getElementById('results');
+
+        form.onsubmit = async (e) => {
+            e.preventDefault();
+            const fileInput = document.getElementById('workoutFile');
+            const formData = new FormData();
+            formData.append('file', fileInput.files[0]);
+
+            // Reactive update: Show loading state
+            document.getElementById('submitBtn').innerText = "Calculating...";
+
+            try {
+                const response = await fetch('https://weights-app.onrender.com/calculate', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await response.json();
+
+                // Update UI Reactively
+                document.getElementById('totalVol').innerText = data.total_volume.toLocaleString();
+                
+                const tbody = document.querySelector('#detailsTable tbody');
+                tbody.innerHTML = ''; // Clear old results
+                
+                data.exercises.forEach(ex => {
+                    const row = `<tr>
+                        <td>${ex.weight}</td>
+                        <td>${ex.sets}</td>
+                        <td>${ex.reps}</td>
+                        <td>${ex.volume}</td>
+                    </tr>`;
+                    tbody.innerHTML += row;
+                });
+
+                resultsSection.style.display = 'block';
+            } catch (error) {
+                alert("Error connecting to backend. Make sure main.py is running!");
+            } finally {
+                document.getElementById('submitBtn').innerText = "Calculate Volume";
+            }
+        };
+    </script>
+</body>
+</html>
